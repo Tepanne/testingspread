@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Login & Register</title>
+    <style>
+      body { font-family: Arial, sans-serif; margin: 20px; }
+      .menu { margin-bottom: 20px; }
+      .menu button { padding: 10px 20px; margin-right: 10px; }
+      .form-container { display: none; }
+      .active { display: block; }
+      form { margin-top: 20px; }
+      label { display: block; margin-top: 10px; }
+      input[type="text"],
+      input[type="password"],
+      input[type="email"] { width: 300px; padding: 8px; }
+      input[type="submit"] { margin-top: 15px; padding: 10px 20px; }
+      #loading { display: none; font-weight: bold; margin-top: 10px; }
+    </style>
+  </head>
+  <body>
+    <h2>Selamat Datang</h2>
+    <div class="menu">
+      <button onclick="showForm('login')">Login</button>
+      <button onclick="showForm('register')">Daftar</button>
+    </div>
+
+    <!-- Form Login -->
+    <div id="loginForm" class="form-container active">
+      <h3>Login</h3>
+      <form id="login" method="post">
+        <label for="login_username">Username:</label>
+        <input type="text" id="login_username" name="username" required>
+        
+        <label for="login_password">Password:</label>
+        <input type="password" id="login_password" name="password" required>
+        
+        <input type="submit" value="Login">
+      </form>
+      <div id="loading">Loading...</div>
+    </div>
+
+    <!-- Form Register -->
+    <div id="registerForm" class="form-container">
+      <h3>Daftar Akun</h3>
+      <form id="register" method="post" action="/register">
+        <label for="reg_username">Username:</label>
+        <input type="text" id="reg_username" name="username" required>
+        
+        <label for="reg_password">Password:</label>
+        <input type="password" id="reg_password" name="password" required>
+        
+        <label for="reg_email">Email:</label>
+        <input type="email" id="reg_email" name="email" required>
+        
+        <input type="submit" value="Daftar">
+      </form>
+    </div>
+
+    <script>
+      // Fungsi untuk menampilkan form yang diinginkan
+      function showForm(formType) {
+        if(formType === 'login'){
+          document.getElementById('loginForm').classList.add('active');
+          document.getElementById('registerForm').classList.remove('active');
+        } else {
+          document.getElementById('registerForm').classList.add('active');
+          document.getElementById('loginForm').classList.remove('active');
+        }
+      }
+      
+      // Penanganan submit form login dengan tampilan loading
+      document.getElementById('login').addEventListener('submit', function(e) {
+        e.preventDefault();
+        document.getElementById('loading').style.display = 'block';
+        var formData = new FormData(this);
+        var data = {
+          username: formData.get('username'),
+          password: formData.get('password')
+        };
+
+        fetch('/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        })
+        .then(function(response) {
+          document.getElementById('loading').style.display = 'none';
+          if(response.ok) return response.text();
+          throw new Error('Kredensial tidak valid');
+        })
+        .then(function(text) {
+          alert(text);
+          // Tambahkan redirect atau tindakan lain jika diperlukan
+        })
+        .catch(function(error) {
+          alert(error.message);
+        });
+      });
+    </script>
+  </body>
+</html>
